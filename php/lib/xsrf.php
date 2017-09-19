@@ -1,6 +1,6 @@
 <?php
-
-use Lcobucci\JWT\Builder;
+require_once dirname(__DIR__ , 2) . "/vendor/autoload.php";
+use Lcobucci\JWT\{Builder};
 /**
  * this if block exists because apache_request_headers() is not portable across web servers
  * this will clone apache_request_headers()'s functionality if the web server doesn't support apache_request_headers()
@@ -8,6 +8,8 @@ use Lcobucci\JWT\Builder;
  *
  * @see http://php.net/manual/en/function.apache-request-headers.php apache_request_headers()
  **/
+
+
 if(function_exists("apache_request_headers") === false) {
 	/**
 	 * clones apache_request_headers()'s behavior
@@ -73,35 +75,39 @@ function verifyXsrf() {
 		throw(new InvalidArgumentException("invalid XSRF token", 401));
 	}
 
-	/**
-	 * this method creates a jwt token that is used for authentication purposes on the front end.
-	 *
-	 * @see https://github.com/lcobucci/jwt/tree/3.2
-	 */
 
-	function createAuthToken() {
+}
 
-		$protectedObject = (object)[
-			'one' => 1,
-			'two' =>2
-		];
-
-		$id =bin2hex(random_bytes(16));
-		$token = (new Builder())
-			->setIssuer("https://bootcamp-coders.cnm.edu")
-			->setAudience("https://bootcamp-coders.cnm.edu")
-			->setId($id)
-			->setIssuedAt(time())
-			->setNotBefore(time() + 60)
-			->setExpiration(time() + 3600)
-			->set('uid',$protectedObject)
-			->getToken();
-
-		return $token;
-
-	}
+/**
+ * this method creates a jwt token that is used for authentication purposes on the front end.
+ *
+ * @see https://github.com/lcobucci/jwt/tree/3.2
+ */
 
 
+function createAuthToken($signer) {
 
+	// create a simple test object to add to the JWT
+	$protectedObject = (object)[
+		'one' => 1,
+		'two' =>2
+	];
+
+	//create a weak hashing for the cookie.
+
+
+	$id =bin2hex(random_bytes(16));
+	$token = (new Builder())
+		->setIssuer("https://bootcamp-coders.cnm.edu")
+		->setAudience("https://bootcamp-coders.cnm.edu")
+		->setId($id)
+		->setIssuedAt(time())
+		->setNotBefore(time() + 60)
+		->setExpiration(time() + 3600)
+		->set('uid',$protectedObject)
+		->sign($signer, 'work')
+		->getToken();
+
+	return $token;
 
 }
