@@ -86,7 +86,6 @@ function verifyXsrf() {
 			'two' =>2
 		];
 
-
 		$id =bin2hex(random_bytes(16));
 		$token = (new Builder())
 			->setIssuer("https://bootcamp-coders.cnm.edu")
@@ -95,9 +94,13 @@ function verifyXsrf() {
 			->setIssuedAt(time())
 			->setNotBefore(time() + 60)
 			->setExpiration(time() + 3600)
-			->set('uid',$protectedObject);
+			->set('uid',$protectedObject)
+			->getToken();
+
+		return $token;
 
 	}
+
 
 
 
