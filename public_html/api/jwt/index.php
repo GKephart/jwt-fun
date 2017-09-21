@@ -28,14 +28,6 @@ try {
 	// if the HTTP method is head check/start the  php session and set the XSRF token
 	if($method === "GET") {
 
-		setXsrfCookie();
-
-		$signer = new Sha512();
-
-		$newToken = createAuthToken();
-
-		$newToken->verify($signer, session_id());
-
 	} else {
 		throw (new \InvalidArgumentException("attempting to brew coffee with a teapot", 418));
 	}

@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__DIR__ , 2) . "/vendor/autoload.php";
-use Lcobucci\JWT\{Builder, Signer\Hmac\Sha512};
+
 /**
  * this if block exists because apache_request_headers() is not portable across web servers
  * this will clone apache_request_headers()'s functionality if the web server doesn't support apache_request_headers()
@@ -36,10 +36,15 @@ if(function_exists("apache_request_headers") === false) {
 /**
  * sets an XSRF cookie, generating one if necessary
  *
- * @param string $cookiePath path the cookie is relevant to, root by default
+ *
  * @throws RuntimeException if the session is not active
  **/
-function setXsrfCookie($cookiePath = "/") {
+function setXsrfCookie() {
+
+
+	//
+	$cookiePath = "/";
+
 	// enforce that the session is active
 	if(session_status() !== PHP_SESSION_ACTIVE) {
 		throw(new RuntimeException("session not active"));
@@ -78,30 +83,12 @@ function verifyXsrf() {
 
 }
 
-/**
- * this method creates a jwt token that is used for authentication purposes on the front end.
- *
- * @see https://github.com/lcobucci/jwt/tree/3.2
- */
+function setAuthHeader($jwt) :void {
 
+	//enforce that the session is active
+	if(session_status() !== PHP_SESSION_ACTIVE) {
+		throw(new RuntimeException("session not active"));
+	}
 
-function createAuthToken() {
-
-	$signer = new Sha512();
-
-	//create a weak salt for the cookie.
-	$id =bin2hex(random_bytes(16));
-
-	$token = (new Builder())
-		->setIssuer("https://bootcamp-coders.cnm.edu")
-		->setAudience("https://bootcamp-coders.cnm.edu")
-		->setId($id)
-		->setIssuedAt(time())
-		->setNotBefore(time() + 60)
-		->setExpiration(time() + 3600)
-		->sign($signer, session_Id())
-		->getToken();
-
-	return $token;
 
 }
