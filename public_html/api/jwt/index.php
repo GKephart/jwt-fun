@@ -4,7 +4,7 @@ use Lcobucci\JWT\{
 	Builder,
 	Parser,
 	ValidationData,
-	Signer\Hmac\Sha256
+	Signer\Hmac\Sha512
 
 };
 
@@ -30,25 +30,11 @@ try {
 
 		setXsrfCookie();
 
-		$signer = new Sha256();
-		$signer2 = new Sha256();
+		$signer = new Sha512();
 
-		$newToken = createAuthToken($signer);
-		var_dump($newToken->verify($signer,'work'));
+		$newToken = createAuthToken();
 
-		/**
-		 *
-		 * wtf... $signer creates the same key pair... wat..
-		 *
-		 * $signer2 = new Sha256();
-		 * $newToken = createAuthToken($signer);
-		 *
-		 * var_dump($newToken->verify($signer2,'work')); // true
-		 */
-
-
-		//var_dump($newToken->getHeaders());
-		//var_dump($newToken->getClaims());
+		$newToken->verify($signer, session_id());
 
 	} else {
 		throw (new \InvalidArgumentException("attempting to brew coffee with a teapot", 418));
