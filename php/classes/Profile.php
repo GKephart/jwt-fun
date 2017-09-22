@@ -354,6 +354,7 @@ class Profile implements \JsonSerializable {
 			throw(new \PDOException("not a new profile"));
 		}
 
+
 		// create query template
 		$query = "INSERT INTO profile(profileActivationToken, profileAtHandle, profileEmail, profileHash, profilePhone, profileSalt) VALUES (:profileActivationToken, :profileAtHandle, :profileEmail, :profileHash, :profilePhone, :profileSalt)";
 		$statement = $pdo->prepare($query);

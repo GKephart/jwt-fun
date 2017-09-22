@@ -1,6 +1,13 @@
 <?php
 require_once dirname(__DIR__ , 2) . "/vendor/autoload.php";
 
+use Lcobucci\JWT\{
+	Builder,
+	Signer\Hmac\Sha512,
+	Parser,
+	ValidationData
+};
+
 /**
  * this if block exists because apache_request_headers() is not portable across web servers
  * this will clone apache_request_headers()'s functionality if the web server doesn't support apache_request_headers()
@@ -83,12 +90,53 @@ function verifyXsrf() {
 
 }
 
-function setAuthHeader($jwt) :void {
+function setJwtAndAuthHeader(string $value, $content ) :void {
 
 	//enforce that the session is active
 	if(session_status() !== PHP_SESSION_ACTIVE) {
 		throw(new RuntimeException("session not active"));
 	}
+
+	$signer = new Sha512();
+
+	//create a weak salt for the cookie.
+	$id =bin2hex(random_bytes(16));
+
+	$token = (new Builder())
+		->set($value, $content)
+		->setIssuer("https://bootcamp-coders.cnm.edu")
+		->setAudience("https://bootcamp-coders.cnm.edu")
+		->setId($id)
+		->setIssuedAt(time())
+		->setExpiration(time() + 3600)
+		->sign($signer, session_Id());
+
+	$_SESSION["JWT"] = $token->getToken();
+
+	//declare a path for the cookie mmm
+	$cookiePath = "/";
+
+	setcookie("JWT", $token->getToken(), 0, $cookiePath );
+}
+
+function validateAuthSession() : void {
+
+	if(empty($_COOKIE["JWT"]) === true) {
+		throw (new InvalidArgumentException("not authorized to preform task1"));
+	}
+
+	$jwt  = $_COOKIE["JWT"];
+
+	var_dump($jwt);
+
+	$parsedJwt = (new Parser())->parse($jwt);
+
+
+
+	if($parsedJwt !== $_SESSION["JWT"]){
+		throw (new InvalidArgumentException("not authorized to preform task2"));
+	}
+
 
 
 }

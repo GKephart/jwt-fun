@@ -2,6 +2,10 @@
 
 require_once dirname(__DIR__, 3) . "/php/lib/xsrf.php";
 
+use Lcobucci\JWT\{Builder,
+	Signer\Hmac\Sha512
+};
+
 $reply = new stdClass();
 $reply->status = 200;
 $reply->data = null;
@@ -11,12 +15,16 @@ try {
 	$method = array_key_exists("HTTP_X_HTTP_METHOD", $_SERVER) ? $_SERVER["HTTP_X_HTTP_METHOD"] : $_SERVER["REQUEST_METHOD"];
 
 	// if the HTTP method is head check/start the  php session and set the XSRF token
-	if($method === "HEAD") {
+	if($method === "GET") {
 		//verify the session, start if not active
 		if(session_status() !== PHP_SESSION_ACTIVE) {
 			session_start();
 		}
 		setXsrfCookie();
+
+		var_dump($_COOKIE["JWT"]);
+		validateAuthSession();
+
 
 	} else {
 		throw (new \InvalidArgumentException("attempting to brew coffee with a teapot", 418));
