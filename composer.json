@@ -1,6 +1,8 @@
 {
   "require": {
     "lcobucci/jwt": "@stable",
-    "mdanter/ecc": "@stable"
+    "mdanter/ecc": "@stable",
+    "guzzlehttp/guzzle": "^6.3",
+    "phpunit/dbunit": "@stable"
   }
 }

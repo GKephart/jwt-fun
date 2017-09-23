@@ -46,7 +46,7 @@ if(function_exists("apache_request_headers") === false) {
  *
  * @throws RuntimeException if the session is not active
  **/
-function setXsrfCookie() {
+function setXsrfCookie() : void {
 
 
 	//
@@ -70,7 +70,7 @@ function setXsrfCookie() {
  * @throws InvalidArgumentException when tokens do not match
  * @throws RuntimeException if the session is not active
  **/
-function verifyXsrf() {
+function verifyXsrf() :void {
 	// enforce that the session is active
 	if(session_status() !== PHP_SESSION_ACTIVE) {
 		throw(new RuntimeException("session not active"));
@@ -90,7 +90,7 @@ function verifyXsrf() {
 
 }
 
-function setJwtAndAuthHeader(string $value, $content ) :void {
+function setJwtAndAuthHeader(string $value, $content ) : void {
 
 	//enforce that the session is active
 	if(session_status() !== PHP_SESSION_ACTIVE) {
@@ -121,11 +121,12 @@ function setJwtAndAuthHeader(string $value, $content ) :void {
 function validateAuthSession() : void {
 
 	//if  the JWT does not exist in the cookie jar throw an exception
-	if(empty($_COOKIE["JWT"]) === true) {
-		throw (new InvalidArgumentException("not authorized to preform task1"));
+	$headers = array_change_key_case(apache_request_headers(), CASE_UPPER);
+	if(array_key_exists("JWT", $headers) === false) {
+		throw(new InvalidArgumentException("invalid XSRF token", 401));
 	}
 
-	// grab the string representation of the
+	//grab the string representation of the Token
 	$jwt  = $_COOKIE["JWT"];
 
 	// parse the string representation of the JWT back into an object
@@ -134,23 +135,20 @@ function validateAuthSession() : void {
 	// validate that the JWT is not out of date.
 	$validator = new ValidationData();
 	$validJwt = $parsedJwt;
-	$validJwt->validate($validator);
-	if( $validJwt!== true) {
+	if( $validJwt->validate($validator)!== true ) {
 		throw (new InvalidArgumentException("not authorized to preform task2"));
 	}
 
 	//verify that the JWT was signed by the server
 	$signer = new Sha512();
 	$verifyJwt = $parsedJwt;
-	$verifyJwt->verify($signer, session_id());
-	if( $validJwt!== true) {
+	if( $verifyJwt->verify($signer, session_id()) !== true) {
 		throw (new InvalidArgumentException("not authorized to preform task3"));
 	}
 
 	//if the JWT in the session does not match the JWT hit the dead mans switch
 	if($parsedJwt !== $_SESSION["JWT"]){
-		$_SESSION = [];
-		unset($_COOKIE["XSRF-TOKEN"], $_COOKIE["JWT"]);
+		unset($_COOKIE["XSRF-TOKEN"], $_COOKIE["JWT"], $_COOKIE["PHPSESSID"] );
 		throw (new InvalidArgumentException("please log in again"));
 	}
 }
