@@ -58,14 +58,14 @@ function validateAuthSession(): void {
 	$validator->setId(session_id());
 	$validJwt = $parsedJwt;
 	if($validJwt->validate($validator) !== true) {
-		throw (new InvalidArgumentException("not authorized to preform task2"));
+		throw (new InvalidArgumentException("not authorized to preform task",403));
 	}
 
 //verify that the JWT was signed by the server
 	$signer = new Sha512();
 	$verifyJwt = $parsedJwt;
 	if($verifyJwt->verify($signer, $_SESSION["signature"]) !== true) {
-		throw (new InvalidArgumentException("not authorized to preform task3"));
+		throw (new InvalidArgumentException("not authorized to preform task", 400));
 	}
 
 //if the JWT in the session does not match the JWT hit the dead mans switch
