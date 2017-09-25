@@ -3,6 +3,7 @@
 require_once dirname(__DIR__, 3) . "/vendor/autoload.php";
 require_once dirname(__DIR__, 3) . "/php/classes/autoload.php";
 require_once dirname(__DIR__, 3) . "/php/lib/xsrf.php";
+require_once dirname(__DIR__, 3) . "/php/lib/jwt.php";
 require_once("/etc/apache2/capstone-mysql/encrypted-config.php");
 
 use Edu\Cnm\DataDesign\{
@@ -29,19 +30,9 @@ $reply->status = 200;
 $reply->data = null;
 
 try {
+
 	//grab the mySQL connection
 	$pdo = connectToEncryptedMySQL("/etc/apache2/capstone-mysql/ddctwitter.ini");
-
-
-	// mock a logged in user by forcing the session. This is only for testing purposes and should not be in the live code.
-
-	// profileId of profile to use for testing,
-	$person = 95;
-
-	// grab a profile by its profileId and add it to the session
-	$_SESSION["profile"] = Profile::getProfileByProfileId($pdo, $person);
-
-
 
 	//determine which HTTP method was used
 	$method = array_key_exists("HTTP_X_HTTP_METHOD", $_SERVER) ? $_SERVER["HTTP_X_HTTP_METHOD"] : $_SERVER["REQUEST_METHOD"];
@@ -64,6 +55,8 @@ try {
 
 		//get a specific tweet or all tweets and update reply
 		if(empty($id) === false) {
+
+			verifyAuthSession();
 			$tweet = Tweet::getTweetByTweetId($pdo, $id);
 			if($tweet !== null) {
 				$reply->data = $tweet;
@@ -117,6 +110,8 @@ try {
 				throw(new \InvalidArgumentException("You are not allowed to edit this tweet", 403));
 			}
 
+			verifyAuthSession();
+
 			// update all attributes
 			$tweet->setTweetDate($requestObject->tweetDate);
 			$tweet->setTweetContent($requestObject->tweetContent);
@@ -131,6 +126,8 @@ try {
 			if(empty($_SESSION["profile"]) === true) {
 				throw(new \InvalidArgumentException("you must be logged in to post tweets", 403));
 			}
+
+			verifyAuthSession();
 
 			// create new tweet and insert into the database
 			$tweet = new Tweet(null, $_SESSION["profile"]->getProfileId(), $requestObject->tweetContent, null);

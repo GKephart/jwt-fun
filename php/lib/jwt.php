@@ -33,13 +33,13 @@ function setJwtAndAuthHeader(string $value, $content): void {
 		->sign($signer, $signature);
 
 //store the JWT in the session for verification
-	$_SESSION["JWT"] = $token;
+	$_SESSION["JWT-TOKEN"] = $token;
 
 // add the JWT to the header
-	setcookie("JWT", $token->getToken(), 0, "/");
+	setcookie("JWT-TOKEN", $token->getToken(), 0, "/");
 }
 
-function validateAuthSession(): void {
+function verifyAuthSession(): void {
 
 //if  the JWT does not exist in the cookie jar throw an exception
 	$headers = array_change_key_case(apache_request_headers(), CASE_UPPER);
@@ -48,7 +48,7 @@ function validateAuthSession(): void {
 	}
 
 //grab the string representation of the Token
-	$jwt = $_COOKIE["JWT"];
+	$jwt = $_COOKIE["JWT-TOKEN"];
 
 // parse the string representation of the JWT back into an object
 	$parsedJwt = (new Parser())->parse($jwt);
@@ -70,7 +70,7 @@ function validateAuthSession(): void {
 
 //if the JWT in the session does not match the JWT hit the dead mans switch
 	if($parsedJwt !== $_SESSION["JWT"]) {
-		unset($_COOKIE["XSRF-TOKEN"], $_COOKIE["JWT"]);
+		unset($_COOKIE["XSRF-TOKEN"], $_COOKIE["JWT-TOKEN"]);
 		$_SESSION = [];
 		throw (new InvalidArgumentException("please log in again"));
 	}
