@@ -1,12 +1,6 @@
 <?php
-require_once dirname(__DIR__ , 2) . "/vendor/autoload.php";
 
-use Lcobucci\JWT\{
-	Builder,
-	Signer\Hmac\Sha512,
-	Parser,
-	ValidationData
-};
+
 
 /**
  * this if block exists because apache_request_headers() is not portable across web servers
@@ -90,65 +84,3 @@ function verifyXsrf() :void {
 
 }
 
-function setJwtAndAuthHeader(string $value, $content ) : void {
-
-	//enforce that the session is active
-	if(session_status() !== PHP_SESSION_ACTIVE) {
-		throw(new RuntimeException("session not active"));
-	}
-
-	$signer = new Sha512();
-
-	//create a weak salt for the cookie.
-	$id =bin2hex(random_bytes(16));
-
-	$token = (new Builder())
-		->set($value, $content)
-		->setIssuer("https://bootcamp-coders.cnm.edu")
-		->setAudience("https://bootcamp-coders.cnm.edu")
-		->setId($id)
-		->setIssuedAt(time())
-		->setExpiration(time() + 3600)
-		->sign($signer, session_Id());
-
-	$_SESSION["JWT"] = $token;
-
-	//declare a path for the cookie mmm
-
-	setcookie("JWT", $token->getToken(), 0, "/" );
-}
-
-function validateAuthSession() : void {
-
-	//if  the JWT does not exist in the cookie jar throw an exception
-	$headers = array_change_key_case(apache_request_headers(), CASE_UPPER);
-	if(array_key_exists("JWT", $headers) === false) {
-		throw(new InvalidArgumentException("invalid XSRF token", 401));
-	}
-
-	//grab the string representation of the Token
-	$jwt  = $_COOKIE["JWT"];
-
-	// parse the string representation of the JWT back into an object
-	$parsedJwt = (new Parser())->parse($jwt);
-
-	// validate that the JWT is not out of date.
-	$validator = new ValidationData();
-	$validJwt = $parsedJwt;
-	if( $validJwt->validate($validator)!== true ) {
-		throw (new InvalidArgumentException("not authorized to preform task2"));
-	}
-
-	//verify that the JWT was signed by the server
-	$signer = new Sha512();
-	$verifyJwt = $parsedJwt;
-	if( $verifyJwt->verify($signer, session_id()) !== true) {
-		throw (new InvalidArgumentException("not authorized to preform task3"));
-	}
-
-	//if the JWT in the session does not match the JWT hit the dead mans switch
-	if($parsedJwt !== $_SESSION["JWT"]){
-		unset($_COOKIE["XSRF-TOKEN"], $_COOKIE["JWT"], $_COOKIE["PHPSESSID"] );
-		throw (new InvalidArgumentException("please log in again"));
-	}
-}

@@ -35,17 +35,7 @@ abstract class DataDesignApiTest extends TestCase {
 		// get an XSRF token by visiting the main site
 		$this->guzzle = new Client(["cookies" => true]);
 		$this->guzzle->get("https://bootcamp-coders.cnm.edu/");
-
-		// get the XSRF cookie - this can be simplified once my pull request is published in Guzzle 6.3
-		// @see https://github.com/guzzle/guzzle/pull/1318
-		$this->cookieJar = $this->guzzle->getConfig("cookies");
-		$cookieArray = $this->cookieJar->toArray();
-		foreach($cookieArray as $cookie) {
-			if(strcasecmp($cookie["Name"], "XSRF-TOKEN") === 0) {
-				$this->xsrfToken = $cookie["Value"];
-				break;
-			}
-		}
+		
 	}
 
 }
