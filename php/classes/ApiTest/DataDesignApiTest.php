@@ -34,8 +34,22 @@ abstract class DataDesignApiTest extends TestCase {
 	 * @var string JWT
 	 */
 	protected $jwtToken = "";
+
+	public function signIn() {
+
+		$requestObject = (object) ["profileEmail" => "email@email.com", "profilePassword" => "password"];
+
+		$this->assertNotEmpty($this->xsrfToken);
+		$this->guzzle->post(
+			"https://bootcamp-coders.cnm.edu/~gkephart/ng4-bootcamp/public_html/api/sign-in/",
+			["body" => json_encode($requestObject),
+				"headers" =>["X-XSRF-TOKEN" => $this->xsrfToken]]
+		);
+
+	}
+
 	/**
-	 * JWT token purpose of tests
+	 * setup method for testing my implementation of JWT.
 	 */
 	public function setUp() {
 
@@ -50,10 +64,16 @@ abstract class DataDesignApiTest extends TestCase {
 		foreach($cookieArray as $cookie) {
 			if(strcasecmp($cookie["Name"], "XSRF-TOKEN") === 0) {
 				$this->xsrfToken = $cookie["Value"];
-			} elseif(strcasecmp($cookie["Name"], "JWT-TOKEN") === 0) {
-				$this->jwtToken = $cookie["Value"];
-			} else {
 				break;
+			}
+
+			$this->signIn();
+
+			foreach($cookieArray as $token) {
+				if(strcasecmp($token["Name"], "XSRF-TOKEN") === 0) {
+					$this->xsrfToken = $token["Value"];
+					break;
+				}
 			}
 		}
 	}
@@ -63,8 +83,8 @@ abstract class DataDesignApiTest extends TestCase {
 	 */
 	public final function tearDown() {
 		$this->guzzle->get("https://bootcamp-coders.cnm.edu/~gkephart/ng4-bootcamp/public_html/api/sign-out/");
-
-
 	}
+
+
 
 }
