@@ -57,8 +57,7 @@ abstract class DataDesignApiTest extends TestCase {
 		$this->cookieJar = $this->guzzle->getConfig("cookies");
 
 		//grab the (xsrf) cookie from  the cookie jar to eat a little know then the rest later
-		$this->xsrfToken = $this->cookieJar->getCookieByName("XSRF-TOKEN");
-		var_dump($this->xsrfToken);
+		var_dump($this->cookieJar);
 
 		// sign in to get a JWT token
 		$this->signIn();

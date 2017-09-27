@@ -36,7 +36,7 @@ function setJwtAndAuthHeader(string $value, $content): void {
 	$_SESSION["JWT-TOKEN"] = $token;
 
 // add the JWT to the header
-	setcookie("JWT-TOKEN", $token->getToken(), 0, "/");
+	setcookie("JWT-TOKEN", $token->getToken(), 0, "/", null, true, true);
 }
 
 function verifyAuthSession(): void {
