@@ -1,7 +1,8 @@
-<?
+<?php
 
 namespace Edu\Cnm\DataDesign\ApiTest;
 
+require_once(dirname(__DIR__) . "/autoload.php");
 /**
  * Test to insure that the new JWT implementation is bug free and efficient cross checking against the Tweet Api
  *
@@ -12,7 +13,7 @@ class JwtTweetApiTest extends DataDesignApiTest {
 	/**
 	 * Api endpoint to test against
 	 */
-	protected $postApiEndPoint = "https://bootcamp-coders.cnm.edu/~gkephart/ng4-bootcamp/public_html/api/tweet";
+	protected $postApiEndPoint = "https://bootcamp-coders.cnm.edu/~gkephart/ng4-bootcamp/public_html/api/tweet/";
 
 	/**
 	 * helper method to create a valid object to send to the API
@@ -29,7 +30,7 @@ class JwtTweetApiTest extends DataDesignApiTest {
 	public function validGetTweetByTweetId() : void {
 
 		//make a ajax call to the restEndpoint in order  to get a tweet by tweetId
-		$reply = $this->guzzle->get($this->postApiEndPoint . "?id=35", ["headers" =>
+		$reply = $this->guzzle->get($this->postApiEndPoint . "35", ["headers" =>
 			["X-XSRF-TOKEN" => $this->xsrfToken, "X-JWT-TOKEN" => $this->jwtToken]]
 		);
 

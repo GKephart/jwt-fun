@@ -1,7 +1,8 @@
 <phpunit>
 	<testsuites>
 		<testsuite name="Twitter Data Design API">
-			<file>JwtTweetApiTest.php</file>
+			<file>SignUpApiTest.php</file>
+		<file>JwtTweetApiTest.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>

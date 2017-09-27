@@ -6,8 +6,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJarInterface;
 use PHPUnit\Framework\TestCase;
 
-require_once("/etc/apache2/capstone-mysql/encrypted-config.php");
-
 require_once(dirname(__DIR__, 3) . "/vendor/autoload.php");
 
 abstract class DataDesignApiTest extends TestCase {

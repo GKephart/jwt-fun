@@ -2,12 +2,12 @@
   "require": {
     "lcobucci/jwt": "@stable",
     "mdanter/ecc": "@stable",
-    "guzzlehttp/guzzle": "^6.3",
+    "guzzlehttp/guzzle": "@stable",
     "phpunit/dbunit": "@stable",
     "ramsey/uuid": "^3.7"
   },
   "scripts": {
     "phpdoc": "./vendor/bin/phpdoc -t doc -d ./php/classes",
-    "phpunit": "./vendor/bin/phpunit -c ./php/classes/ApiTest --coverage-html coverage"
+    "phpunit": "./vendor/bin/phpunit -c ./php/classes/ApiTest"
   }
 }
