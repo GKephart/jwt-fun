@@ -21,6 +21,7 @@ function setJwtAndAuthHeader(string $value, $content): void {
 
 //create a UUID to sign the JWT and then store it in the session
 	$signature = Uuid::uuid1();
+	$signature->toString();
 	$_SESSION["signature"] = $signature;
 
 	$token = (new Builder())
