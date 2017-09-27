@@ -1,5 +1,7 @@
 <?php
+
 require_once dirname(__DIR__, 2) . "/vendor/autoload.php";
+require_once dirname(__DIR__) . "/lib/uuid.php";
 
 use Lcobucci\JWT\{
 	Builder, Signer\Hmac\Sha512, Parser, ValidationData
@@ -20,8 +22,10 @@ function setJwtAndAuthHeader(string $value, $content): void {
 	$signer = new Sha512();
 
 //create a UUID to sign the JWT and then store it in the session
-	$signature = Uuid::uuid1();
-	$signature->toString();
+	$signature = generateUuidV4();
+
+
+
 	$_SESSION["signature"] = $signature;
 
 	$token = (new Builder())
