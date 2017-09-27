@@ -65,7 +65,6 @@ abstract class DataDesignApiTest extends TestCase {
 		//grab the (jwt) cookie from the cookieJar and save it for later
 		$this->jwtToken = $this->cookieJar->getCookieByName("JWT-TOKEN");
 		$this->assertNotEmpty($this->jwtToken);
-
 	}
 
 	/**
