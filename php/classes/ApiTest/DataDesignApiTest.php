@@ -4,7 +4,6 @@ namespace Edu\Cnm\DataDesign\ApiTest;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJarInterface;
-use function GuzzleHttp\Psr7\str;
 use PHPUnit\Framework\TestCase;
 
 require_once("/etc/apache2/capstone-mysql/encrypted-config.php");
@@ -42,10 +41,7 @@ abstract class DataDesignApiTest extends TestCase {
 		$this->assertNotEmpty($this->xsrfToken);
 		$this->guzzle->post(
 			"https://bootcamp-coders.cnm.edu/~gkephart/ng4-bootcamp/public_html/api/sign-in/",
-			["body" => json_encode($requestObject),
-				"headers" =>["X-XSRF-TOKEN" => $this->xsrfToken]]
-		);
-
+			["body" => json_encode($requestObject), "headers" =>["X-XSRF-TOKEN" => $this->xsrfToken]]);
 	}
 
 	/**
@@ -57,25 +53,18 @@ abstract class DataDesignApiTest extends TestCase {
 		$this->guzzle = new Client(["cookies" => true]);
 		$this->guzzle->get("https://bootcamp-coders.cnm.edu/");
 
-		//get the XSRF token andJWT and put it into the cookie jar
+		//put the cookies into the cookie jar
 		$this->cookieJar = $this->guzzle->getConfig("cookies");
-		$cookieArray = $this->cookieJar->toArray();
 
-		foreach($cookieArray as $cookie) {
-			if(strcasecmp($cookie["Name"], "XSRF-TOKEN") === 0) {
-				$this->xsrfToken = $cookie["Value"];
-				break;
-			}
+		//grab the (xsrf) cookie from  the cookie jar to eat now
+		$this->xsrfToken = $this->cookieJar->getCookieByName("XSRF-TOKEN");
 
-			$this->signIn();
+		// sign in to get a JWT token
+		$this->signIn();
 
-			foreach($cookieArray as $token) {
-				if(strcasecmp($token["Name"], "XSRF-TOKEN") === 0) {
-					$this->xsrfToken = $token["Value"];
-					break;
-				}
-			}
-		}
+		//grab
+		$this->cookieJar->getCookieByName("JWT-TOKEN");
+
 	}
 
 	/**
@@ -84,7 +73,4 @@ abstract class DataDesignApiTest extends TestCase {
 	public final function tearDown() {
 		$this->guzzle->get("https://bootcamp-coders.cnm.edu/~gkephart/ng4-bootcamp/public_html/api/sign-out/");
 	}
-
-
-
 }
