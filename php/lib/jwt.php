@@ -24,9 +24,8 @@ function setJwtAndAuthHeader(string $value, $content): void {
 //create a UUID to sign the JWT and then store it in the session
 	$signature = generateUuidV4();
 
-
-
-	$_SESSION["signature"] = $signature;
+	//store the signature in its string version
+	$_SESSION["signature"] = $signature->toString();
 
 	$token = (new Builder())
 		->set($value, $content)
@@ -35,7 +34,7 @@ function setJwtAndAuthHeader(string $value, $content): void {
 		->setId(session_id())
 		->setIssuedAt(time())
 		->setExpiration(time() + 3600)
-		->sign($signer, $signature);
+		->sign($signer, $signature->toString());
 
 //store the JWT in the session for verification
 	$_SESSION["JWT-TOKEN"] = $token;
