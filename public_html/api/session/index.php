@@ -22,8 +22,7 @@ try {
 		}
 		setXsrfCookie();
 
-		var_dump($_COOKIE["JWT"]);
-		validateAuthSession();
+
 
 
 	} else {

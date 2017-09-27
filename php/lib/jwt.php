@@ -72,7 +72,7 @@ function verifyAuthSession(): void {
 	}
 
 	//if the JWT in the session does not match the JWT hit the dead mans switch
-	if($parsedJwt !== $_SESSION["JWT"]) {
+	if($parsedJwt !== $_SESSION["JWT-TOKEN"]) {
 		$_COOKIE = [];
 		$_SESSION = [];
 		throw (new InvalidArgumentException("please log in again", 404));
