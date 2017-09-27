@@ -26,6 +26,18 @@ class JwtTweetApiTest extends DataDesignApiTest {
 	/**
 	 * method to test get tweetByTweetId this will run through all of the test case for validateJwtToken.
 	 */
+	public function validGetTweetByTweetId() : void {
 
+		//make a ajax call to the restEndpoint in order  to get a tweet by tweetId
+		$reply = $this->guzzle->get($this->postApiEndPoint . "?id=35", ["headers" =>
+			["X-XSRF-TOKEN" => $this->xsrfToken, "X-JWT-TOKEN" => $this->jwtToken]]
+		);
+		$replyObject = json_decode($reply->getBody());
 
+		//enforce that the ajax call was successful and cookies were returned successfully
+		$this->assertEquals($reply->getStatusCode(), 200);
+		$this->assertEquals($replyObject->status, 200);
+		$this->assertEquals($reply->getHeader("JWT-Token"), $this->jwtToken);
+		$this->assertEquals($reply->getHeader("XSRF-TOKEN"), $this->xsrfToken);
+	}
 }
