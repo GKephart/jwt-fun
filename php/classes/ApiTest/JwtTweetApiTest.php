@@ -26,15 +26,6 @@ class JwtTweetApiTest extends DataDesignApiTest {
 	}
 
 
-
-	/**
-	 * create dependent objects before running each test
-	 **/
-	public final function setUp() {
-		// run the default setUp() method first
-		parent::setUp();
-	}
-
 	/**
 	 * method to test get tweetByTweetId this will run through all of the test case for validateJwtToken.
 	 * @test

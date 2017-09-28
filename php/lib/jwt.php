@@ -36,11 +36,17 @@ function setJwtAndAuthHeader(string $value, $content): void {
 		->setExpiration(time() + 3600)
 		->sign($signer, $signature->toString());
 
+
+	$token->getToken();
+
+
 //store the JWT in the session for verification
 	$_SESSION["JWT-TOKEN"] = $token;
 
 // add the JWT to the header
 	setcookie("JWT-TOKEN", $token->getToken(), 0, "/", null, true, true);
+
+
 }
 
 function verifyAuthSession(): void {
@@ -71,10 +77,15 @@ function verifyAuthSession(): void {
 		throw (new InvalidArgumentException("not authorized to preform task", 403));
 	}
 
+	var_dump($_SESSION);
+	var_dump($parsedJwt);
+
 	//if the JWT in the session does not match the JWT hit the dead mans switch
 	if($parsedJwt !== $_SESSION["JWT-TOKEN"]) {
-		$_COOKIE = [];
-		$_SESSION = [];
+
+		//TODO: Dammit Jim Im a doctor note a note taker
+		//$_COOKIE = [];
+		//$_SESSION = [];
 		throw (new InvalidArgumentException("please log in again", 404));
 	}
 }

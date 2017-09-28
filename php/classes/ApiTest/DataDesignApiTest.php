@@ -41,7 +41,7 @@ abstract class DataDesignApiTest extends TestCase {
 
 		$reply = $this->guzzle->post(
 			"https://bootcamp-coders.cnm.edu/~gkephart/ng4-bootcamp/public_html/api/sign-in/",
-			["body" => json_encode($requestObject), "headers" =>["X-XSRF-TOKEN" => $this->xsrfToken]]);
+			["body" => json_encode($requestObject), "headers" => ["X-XSRF-TOKEN" => $this->xsrfToken]]);
 
 		$requestObject = json_decode($reply->getBody());
 
@@ -61,7 +61,7 @@ abstract class DataDesignApiTest extends TestCase {
 		$this->cookieJar = $this->guzzle->getConfig("cookies");
 
 		//grab the (xsrf) cookie from  the cookie jar to eat a little know then the rest later
-		$this->xsrfToken = $this->cookieJar;
+		$this->xsrfToken = $this->cookieJar->getCookieByName("XSRF-TOKEN");
 		var_dump($this->xsrfToken);
 
 		// sign in to get a JWT token

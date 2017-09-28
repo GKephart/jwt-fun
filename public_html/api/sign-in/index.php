@@ -60,12 +60,8 @@ try {
 			throw(new \InvalidArgumentException("Password or email is incorrect."));
 		}
 
-
+		//add the profile to JWT
 		setJWTAndAuthHeader("profile", $profile);
-
-		$_SESSION["profile"] = $profile;
-
-
 
 		// create the JWT to use for auth on the front-end
 
