@@ -37,6 +37,9 @@ class JwtTweetApiTest extends DataDesignApiTest {
 			["X-XSRF-TOKEN" => $this->xsrfToken, "X-JWT-TOKEN" => $this->jwtToken]]
 		);
 
+
+		var_dump($reply->getBody());
+
 		//decode the reply object for later use
 		$replyObject = json_decode($reply->getBody());
 

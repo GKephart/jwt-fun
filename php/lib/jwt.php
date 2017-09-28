@@ -37,12 +37,13 @@ function setJwtAndAuthHeader(string $value, $content): void {
 		->sign($signer, $signature->toString())
 		->getToken();
 
+	// add the JWT to the header
+	setcookie("JWT-TOKEN", $token, 0, "/");
 
-//store the JWT in the session for verification
-	$_SESSION["JWT-TOKEN"] = $token->getClaims();
 
-// add the JWT to the header
-	setcookie("JWT-TOKEN", $token, 0, "/", null, true, true);
+	$_SESSION["JWT-TOKEN"] = $token->getPayload();
+
+	var_dump($token->getPayload());
 
 
 }
@@ -57,6 +58,10 @@ function verifyAuthSession(): void {
 
 	//grab the string representation of the Token
 	$jwt = $headers["X-JWT-TOKEN"];
+
+	var_dump($_SESSION);
+
+	var_dump($jwt);
 
 	// parse the string representation of the JWT back into an object
 	$parsedJwt = (new Parser())->parse($jwt);
@@ -75,14 +80,16 @@ function verifyAuthSession(): void {
 		throw (new InvalidArgumentException("not authorized to preform task", 403));
 	}
 
+
+	//TODO: Dammit Jim Im a doctor note a note taker
 	var_dump($_SESSION["JWT-TOKEN"]);
 	var_dump($parsedJwt);
 
 	//if the claims for the JWT in the session does not match the claims in the JWT in the header does not match hit the dead mans switch
-	if($parsedJwt->getClaims() !== $_SESSION["JWT-TOKEN"]) {
+	if($jwt !== $_SESSION["JWT-TOKEN"]) {
 		//TODO: Dammit Jim Im a doctor note a note taker
-		//$_COOKIE = [];
-		//$_SESSION = [];
+		$_COOKIE = [];
+		$_SESSION = [];
 		throw (new InvalidArgumentException("please log in again", 404));
 	}
 }
