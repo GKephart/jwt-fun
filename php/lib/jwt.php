@@ -6,9 +6,7 @@ require_once dirname(__DIR__) . "/lib/uuid.php";
 use Lcobucci\JWT\{
 	Builder, Signer\Hmac\Sha512, Parser, ValidationData
 };
-use Ramsey\Uuid\{
-	Uuid
-};
+
 
 
 function setJwtAndAuthHeader(string $value, $content): void {
@@ -38,7 +36,7 @@ function setJwtAndAuthHeader(string $value, $content): void {
 		->getToken();
 
 	// add the JWT to the header
-	setcookie("JWT-TOKEN", $token, 0, "/");
+	setcookie("JWT-TOKEN", $token, 0, "/", null,true, true);
 
 	$_SESSION["JWT-TOKEN"] = $token->getPayload();
 
@@ -50,6 +48,11 @@ function verifyAuthSession(): void {
 	$headers = array_change_key_case(apache_request_headers(), CASE_UPPER);
 	if(array_key_exists("X-JWT-TOKEN", $headers) === false) {
 		throw(new InvalidArgumentException("invalid JWT token", 401));
+	}
+
+	//enforce the session has needed content
+	if(empty($_SESSION['JWT-TOKEN'] || $_SESSION["signature"]) === true) {
+		throw new InvalidArgumentException("not logged in", 401);
 	}
 
 	//grab the string representation of the Token from the header then parse it into an object
@@ -76,6 +79,4 @@ function verifyAuthSession(): void {
 	if($headerJwt->verify($signer, $_SESSION["signature"]) !== true) {
 		throw (new InvalidArgumentException("not authorized to preform task", 403));
 	}
-
-
 }
