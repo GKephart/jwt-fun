@@ -38,8 +38,7 @@ function setJwtAndAuthHeader(string $value, $content): void {
 		->getToken();
 
 	// add the JWT to the header
-	setcookie("JWT-TOKEN", $token->getPayload(), 0, "/");
-
+	setcookie("JWT-TOKEN", $token, 0, "/");
 
 	$_SESSION["JWT-TOKEN"] = $token->getPayload();
 
@@ -57,11 +56,12 @@ function verifyAuthSession(): void {
 	$headerJwt = $headers["X-JWT-TOKEN"];
 	$headerJwt = (new Parser())->parse($headerJwt);
 
-	//grab the string representation of the Token from the session then parse it into an object
-	$sessionJWT = $_SESSION["JWT-TOKEN"];
-	$sessionJWT= (new Parser())->parse($sessionJWT);
-
-	if ($sessionJWT->getClaims() !== $headerJwt->getClaims())
+	//enforce that the JWT payload in the session matches the payload from header
+	if ($_SESSION["JWT-TOKEN"] !== $headerJwt->getPayload()) {
+		$_COOKIE = [];
+		$_SESSION = [];
+		throw (new InvalidArgumentException("please log in again", 404));
+	}
 
 	//enforce the JWT is valid
 	$validator = new ValidationData();
