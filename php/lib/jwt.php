@@ -42,7 +42,7 @@ function setJwtAndAuthHeader(string $value, $content): void {
 
 }
 
-function verifyAuthSession(): void {
+function JwtValidator() : bool {
 
 	//if  the JWT does not exist in the cookie jar throw an exception
 	$headers = array_change_key_case(apache_request_headers(), CASE_UPPER);
@@ -66,6 +66,13 @@ function verifyAuthSession(): void {
 		throw (new InvalidArgumentException("please log in again", 404));
 	}
 
+	verifiedAndValidatedSignature($headerJwt);
+
+	return true;
+}
+
+function verifiedAndValidatedSignature ( \Lcobucci\JWT\Token  $headerJwt) : void {
+
 	//enforce the JWT is valid
 	$validator = new ValidationData();
 	$validator->setId(session_id());
@@ -79,4 +86,5 @@ function verifyAuthSession(): void {
 	if($headerJwt->verify($signer, $_SESSION["signature"]) !== true) {
 		throw (new InvalidArgumentException("not authorized to preform task", 403));
 	}
+
 }
