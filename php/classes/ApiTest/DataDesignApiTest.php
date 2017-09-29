@@ -75,7 +75,7 @@ abstract class DataDesignApiTest extends TestCase {
 		// sign in to get a JWT token
 		$this->signIn();
 
-		var_dump($this->cookieJar);
+		var_dump($this);
 
 		//grab the (jwt) cookie from the cookieJar and save it for later
 		$this->jwtToken = $this->cookieJar->getCookieByName("JWT-TOKEN");

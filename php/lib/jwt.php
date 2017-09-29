@@ -38,13 +38,10 @@ function setJwtAndAuthHeader(string $value, $content): void {
 		->getToken();
 
 	// add the JWT to the header
-	setcookie("JWT-TOKEN", $token, 0, "/");
+	setcookie("JWT-TOKEN", $token->getPayload(), 0, "/");
 
 
 	$_SESSION["JWT-TOKEN"] = $token->getPayload();
-
-	var_dump($token->getPayload());
-
 
 }
 
@@ -56,40 +53,29 @@ function verifyAuthSession(): void {
 		throw(new InvalidArgumentException("invalid JWT token", 401));
 	}
 
-	//grab the string representation of the Token
-	$jwt = $headers["X-JWT-TOKEN"];
+	//grab the string representation of the Token from the header then parse it into an object
+	$headerJwt = $headers["X-JWT-TOKEN"];
+	$headerJwt = (new Parser())->parse($headerJwt);
 
-	var_dump($_SESSION);
+	//grab the string representation of the Token from the session then parse it into an object
+	$sessionJWT = $_SESSION["JWT-TOKEN"];
+	$sessionJWT= (new Parser())->parse($sessionJWT);
 
-	var_dump($jwt);
-
-	// parse the string representation of the JWT back into an object
-	$parsedJwt = (new Parser())->parse($jwt);
+	if ($sessionJWT->getClaims() !== $headerJwt->getClaims())
 
 	//enforce the JWT is valid
 	$validator = new ValidationData();
 	$validator->setId(session_id());
-	if($parsedJwt->validate($validator) !== true) {
+	if($headerJwt->validate($validator) !== true) {
 		throw (new InvalidArgumentException("not authorized to preform task", 402));
 	}
 
 	//verify that the JWT was signed by the server
 	$signer = new Sha512();
 
-	if($parsedJwt->verify($signer, $_SESSION["signature"]) !== true) {
+	if($headerJwt->verify($signer, $_SESSION["signature"]) !== true) {
 		throw (new InvalidArgumentException("not authorized to preform task", 403));
 	}
 
 
-	//TODO: Dammit Jim Im a doctor note a note taker
-	var_dump($_SESSION["JWT-TOKEN"]);
-	var_dump($parsedJwt);
-
-	//if the claims for the JWT in the session does not match the claims in the JWT in the header does not match hit the dead mans switch
-	if($jwt !== $_SESSION["JWT-TOKEN"]) {
-		//TODO: Dammit Jim Im a doctor note a note taker
-		$_COOKIE = [];
-		$_SESSION = [];
-		throw (new InvalidArgumentException("please log in again", 404));
-	}
 }
