@@ -9,7 +9,7 @@ use Lcobucci\JWT\{
 
 
 
-function setJwtAndAuthHeader(string $value, $content): void {
+function setJwtAndAuthHeader(string $value, object $content): void {
 
 //enforce that the session is active
 	if(session_status() !== PHP_SESSION_ACTIVE) {

@@ -60,8 +60,14 @@ try {
 			throw(new \InvalidArgumentException("Password or email is incorrect."));
 		}
 
+
+		$authObject = (object) [
+			"profileId" => $profile->getProfileId(),
+			"profileAtHandle" => $profile->getProfileAtHandle()
+		];
+
 		//add the profile to JWT
-		setJWTAndAuthHeader("profile", $profile);
+		setJWTAndAuthHeader("profile", $authObject);
 
 		// create the JWT to use for auth on the front-end
 
