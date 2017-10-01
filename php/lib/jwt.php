@@ -9,7 +9,7 @@ use Lcobucci\JWT\{
 
 
 
-function setJwtAndAuthHeader(string $value, object $content): void {
+function setJwtAndAuthHeader(string $value, stdClass $content): void {
 
 //enforce that the session is active
 	if(session_status() !== PHP_SESSION_ACTIVE) {
@@ -38,21 +38,21 @@ function setJwtAndAuthHeader(string $value, object $content): void {
 	// add the JWT to the header
 	setcookie("JWT-TOKEN", $token, 0, "/", null,true, true);
 
-	$_SESSION["JWT-TOKEN"] = $token->getPayload();
+	$_SESSION["JWT-TOKEN"] = $token->__toString();
 
 }
 
-function JwtValidator() : bool {
+function jwtValidator() {
 
 	//if  the JWT does not exist in the cookie jar throw an exception
 	$headers = array_change_key_case(apache_request_headers(), CASE_UPPER);
 	if(array_key_exists("X-JWT-TOKEN", $headers) === false) {
-		throw(new InvalidArgumentException("invalid JWT token", 401));
+		throw new InvalidArgumentException("invalid JWT token", 400);
 	}
 
 	//enforce the session has needed content
 	if(empty($_SESSION['JWT-TOKEN'] || $_SESSION["signature"]) === true) {
-		throw new InvalidArgumentException("not logged in", 401);
+		throw new InvalidArgumentException("not logged in", 400);
 	}
 
 	//grab the string representation of the Token from the header then parse it into an object
@@ -60,15 +60,13 @@ function JwtValidator() : bool {
 	$headerJwt = (new Parser())->parse($headerJwt);
 
 	//enforce that the JWT payload in the session matches the payload from header
-	if ($_SESSION["JWT-TOKEN"] !== $headerJwt->getPayload()) {
+	if ($_SESSION["JWT-TOKEN"] !== $headerJwt->__toString()) {
 		$_COOKIE = [];
 		$_SESSION = [];
-		throw (new InvalidArgumentException("please log in again", 404));
+		throw (new InvalidArgumentException("please log in again", 400));
 	}
-
 	verifiedAndValidatedSignature($headerJwt);
 
-	return true;
 }
 
 function verifiedAndValidatedSignature ( \Lcobucci\JWT\Token  $headerJwt) : void {

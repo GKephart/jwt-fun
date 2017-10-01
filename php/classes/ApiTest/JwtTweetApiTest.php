@@ -27,18 +27,15 @@ class JwtTweetApiTest extends DataDesignApiTest {
 
 
 	/**
-	 * method to test get tweetByTweetId this will run through all of the test case for validateJwtToken.
-	 * @test
+	 * @test method to test get tweetByTweetId this will run through all of the test case for validateJwtToken.
+	 *
 	 */
 	public function validGetTweetByTweetId() : void {
 
 		//make a ajax call to the restEndpoint in order  to get a tweet by tweetId
 		$reply = $this->guzzle->get($this->postApiEndPoint . "35", ["headers" =>
-			["X-XSRF-TOKEN" => $this->xsrfToken, "X-JWT-TOKEN" => $this->jwtToken]]
+			["X-XSRF-TOKEN" => $this->xsrfToken->getValue(), "X-JWT-TOKEN" => $this->jwtToken->getValue()]]
 		);
-
-
-		var_dump($reply->getBody());
 
 		//decode the reply object for later use
 		$replyObject = json_decode($reply->getBody());
@@ -46,7 +43,28 @@ class JwtTweetApiTest extends DataDesignApiTest {
 		//enforce that the ajax call was successful and the headers are returned successfully
 		$this->assertEquals($reply->getStatusCode(), 200);
 		$this->assertEquals($replyObject->status, 200);
-		$this->assertEquals($reply->getHeader("JWT-Token"), $this->jwtToken);
-		$this->assertEquals($reply->getHeader("XSRF-TOKEN"), $this->xsrfToken);
+	}
+
+
+	/**
+	 * @test invalid test for grabbing a tweet by tweet Id using an incorrect JWT
+	 *
+	 */
+	public function invalidGetTweetByTweetId () : void  {
+
+		$invalidJwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJwcm9maWxlIjp7InByb2ZpbGVJZCI6NjcsInByb2ZpbGVBdEhhbmRsZSI6ImhlbGxvIn0sImlzcyI6Imh0dHBzOlwvXC9ib290Y2FtcC1jb2RlcnMuY25tLmVkdSIsImF1ZCI6Imh0dHBzOlwvXC9ib290Y2FtcC1jb2RlcnMuY25tLmVkdSIsImp0aSI6ImtqMjZjYjRvcmN1c2ZhaGFiYzRxa3VwMXQ4IiwiaWF0IjoxNTA2ODk4ODM1LCJleHAiOjE1MDY5MDI0MzV9.RSQrkBpoeQhR8FRmoU7-gd-UdHapH0ifKgU2rE-3ALSbGjoI4H4-hSUFu3Cnc5lHuf2zfKhS7bgWcW-MsbGcLQ";
+
+		//make a ajax call to the restEndpoint in order  to get a tweet by tweetId
+		$reply = $this->guzzle->get($this->postApiEndPoint . "35", ["headers" =>
+				["X-XSRF-TOKEN" => $this->xsrfToken->getValue(), "X-JWT-TOKEN" => $invalidJwt]]
+		);
+
+		//decode the reply object for later use
+		$replyObject = json_decode($reply->getBody());
+
+		//enforce that the correct error is thrown
+		$this->assertEquals($reply->getStatusCode(), 200);
+		$this->assertEquals($replyObject->status, 399);
+
 	}
 }
