@@ -64,7 +64,31 @@ class JwtTweetApiTest extends DataDesignApiTest {
 
 		//enforce that the correct error is thrown
 		$this->assertEquals($reply->getStatusCode(), 200);
-		$this->assertEquals($replyObject->status, 399);
+		$this->assertEquals($replyObject->status, 400);
 
 	}
+	/**
+	 * @test invalid test to enforce that protected info cannot be accessed without a jwt
+	 */
+
+
+	public function invalidGetTweetWhenLoggedOut() {
+
+
+		// kill the session to verify safe checks work
+		$this->guzzle->get("https://bootcamp-coders.cnm.edu/~gkephart/ng4-bootcamp/public_html/api/sign-out/");
+
+		//make a ajax call to the restEndpoint in order  to get a tweet by tweetId
+		$reply = $this->guzzle->get($this->postApiEndPoint . "35",
+			["headers" => ["X-XSRF-TOKEN" => $this->xsrfToken->getValue(),  "X-JWT-TOKEN" => $this->jwtToken->getValue()]]);
+
+		//decode the reply object for later use
+		$replyObject = json_decode($reply->getBody());
+
+		//enforce that the correct error is thrown
+		$this->assertEquals($reply->getStatusCode(), 200);
+		$this->assertEquals($replyObject->status, 400);
+
+	}
+
 }

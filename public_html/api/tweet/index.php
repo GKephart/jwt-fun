@@ -110,8 +110,7 @@ try {
 			if(empty($_SESSION["profile"]) === true || $_SESSION["profile"]->getProfileId() !== $tweet->getTweetProfileId()) {
 				throw(new \InvalidArgumentException("You are not allowed to edit this tweet", 403));
 			}
-
-			verifyAuthSession();
+			 jwtValidator();
 
 			// update all attributes
 			$tweet->setTweetDate($requestObject->tweetDate);
@@ -128,7 +127,7 @@ try {
 				throw(new \InvalidArgumentException("you must be logged in to post tweets", 403));
 			}
 
-			verifyAuthSession();
+			jwtValidator();
 
 			// create new tweet and insert into the database
 			$tweet = new Tweet(null, $_SESSION["profile"]->getProfileId(), $requestObject->tweetContent, null);
@@ -153,6 +152,8 @@ try {
 		if(empty($_SESSION["profile"]) === true || $_SESSION["profile"]->getProfileId() !== $tweet->getTweetProfileId()) {
 			throw(new \InvalidArgumentException("You are not allowed to delete this tweet", 403));
 		}
+
+		jwtValidator();
 
 		// delete tweet
 		$tweet->delete($pdo);

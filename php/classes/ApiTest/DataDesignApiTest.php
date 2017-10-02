@@ -47,7 +47,6 @@ abstract class DataDesignApiTest extends TestCase {
 
 		$replyObject = json_decode($reply->getBody());
 
-		var_dump($replyObject);
 
 		//enforce that the ajax call was successful and the headers are returned successfully
 		$this->assertEquals($reply->getStatusCode(), 200);
@@ -79,7 +78,7 @@ abstract class DataDesignApiTest extends TestCase {
 		//grab the (jwt) cookie from the cookieJar and save it for later
 		$this->jwtToken = $this->cookieJar->getCookieByName("JWT-TOKEN");
 
-		var_dump($this->jwtToken);
+
 
 
 	}
